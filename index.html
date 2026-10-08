@@ -1,27 +1,435 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Why are you here?</title>
-
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-
-        h1 {
-            font-weight: bold;
-            text-align: center;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d0f0d">
+  <meta name="description" content="Maidehnless terminal directory.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Maidehnless">
+  <meta property="og:description" content="Terminal directory.">
+  <title>maidehnless@terminal:~</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='9' fill='%230d0f0d'/%3E%3Ctext x='9' y='43' font-family='monospace' font-size='32' font-weight='bold' fill='%23a6c5a0'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #0d0f0d;
+      --surface: #111411;
+      --text: #c7d0c5;
+      --dim: #809081;
+      --green: #a6c5a0;
+      --border: #343d34;
+      --hover: #1b261b;
+      --font: "Cascadia Mono", "Consolas", "DejaVu Sans Mono", "Liberation Mono", monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { min-width: 280px; height: 100%; overflow: hidden; }
+    body {
+      margin: 0;
+      min-width: 280px;
+      height: 100%;
+      overflow: hidden;
+      background: var(--background);
+      color: var(--text);
+      font: 16px/1.55 var(--font);
+    }
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    input { font: inherit; }
+    ::selection { background: var(--green); color: var(--background); }
+    :focus-visible { outline: 1px solid var(--green); outline-offset: 3px; }
+    .shell {
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      overflow: hidden;
+    }
+    .terminal {
+      /* Fixed desktop footprint, with viewport-safe scaling on smaller screens. */
+      width: min(768.267px, 100%);
+      height: min(741.2px, 100%);
+      min-height: 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(20px, 3vw, 32px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .history {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overflow-wrap: anywhere;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+      overscroll-behavior: contain;
+    }
+    .history::-webkit-scrollbar { width: 7px; }
+    .history::-webkit-scrollbar-thumb { background: var(--border); }
+    .history::-webkit-scrollbar-track { background: transparent; }
+    .line { min-height: 1.55em; white-space: pre-wrap; }
+    .prompt-line, .command-form {
+      display: flex;
+      align-items: baseline;
+      gap: 1ch;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+    .prefix { flex: none; color: var(--green); }
+    .command-text { color: var(--text); overflow-wrap: anywhere; }
+    .dim { color: var(--dim); }
+    .connected a { color: var(--green); }
+    .blank { min-height: 1.55em; }
+    .banner {
+      display: block;
+      margin: 24px 0 28px;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: pre;
+      color: var(--green);
+      font: 13px/1.22 var(--font);
+      letter-spacing: 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .banner-line { display: inline; }
+    .directory { display: grid; gap: 0; margin: 5px 0 17px; max-width: 700px; }
+    .directory a {
+      color: var(--text);
+      display: flex;
+      align-items: baseline;
+      gap: 2ch;
+      width: fit-content;
+      max-width: 100%;
+      padding: 2px 6px;
+      margin-left: -6px;
+      border: 1px solid transparent;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .directory a:hover, .directory a:focus-visible {
+      color: var(--green);
+      background: var(--hover);
+      border-color: var(--border);
+      outline: none;
+    }
+    .directory .abbr { color: var(--green); min-width: 5ch; }
+    .directory .name { white-space: normal; }
+    /* Separate local terminal commands from external destinations. */
+    .directory .local-command {
+      display: flex;
+      align-items: baseline;
+      gap: 2ch;
+      margin: 1.35em 0 0 -6px;
+      padding: 2px 6px;
+      color: var(--dim);
+    }
+    .command-form { flex: 0 0 auto; margin: 0; padding-top: 10px; }
+    .command-form label { color: var(--green); white-space: nowrap; cursor: text; }
+    .command-form input {
+      border: 0;
+      padding: 0;
+      margin: 0;
+      outline: none;
+      border-radius: 0;
+      flex: 1 1 100px;
+      min-width: 5ch;
+      background: transparent;
+      color: var(--text);
+      caret-color: var(--green);
+      font-size: inherit;
+      line-height: inherit;
+    }
+    .command-form input:focus-visible { outline: none; }
+    .typing::after {
+      content: "▌";
+      color: var(--green);
+      animation: blink .75s steps(1, end) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .no-script { margin-top: 15px; }
+    .no-script a { display: block; padding: 3px 0; }
+    @media(max-width: 760px) {
+      .shell { padding: 0; }
+      .terminal { width: 100%; height: 100%; border: 0; padding: 26px 18px; }
+      .banner { font-size: 12px; }
+    }
+    @media(max-width: 360px) {
+      body { font-size: 15px; }
+      .terminal { padding: 22px 12px; }
+      .banner { font-size: 11px; }
+      .directory { font-size: 14px; }
+    }
+    @media(prefers-reduced-motion: reduce) {
+      .typing::after { animation: none; }
+    }
+  </style>
 </head>
 <body>
-    <h1>I'm doing something, come back later.</h1>
+  <main class="shell">
+    <section class="terminal" aria-label="Maidehnless interactive terminal">
+      <div class="history" id="history" role="log" aria-live="off" aria-label="Terminal output"></div>
+      <form id="command-form" class="command-form" autocomplete="off">
+        <label for="command">guest@maidehnless:~$</label>
+        <input id="command" name="command" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="Terminal command; type help for profile links" autofocus>
+      </form>
+      <noscript>
+        <div class="no-script">JavaScript is disabled. Open a profile directly:
+          <a href="https://steamcommunity.com/id/maidehnless">Steam</a>
+          <a href="https://next.backpack.tf/profiles/76561198320688865/listings">Backpack.tf</a>
+          <a href="https://steamcommunity.com/tradeoffer/new/?partner=360423137&amp;token=fnw5189U">Trade URL</a>
+          <a href="https://discord.com/users/268722078633558019">Discord</a>
+          <a href="https://www.twitch.tv/maidehnless">Twitch</a>
+          <a href="https://gamebanana.com/members/4432632">GameBanana</a>
+          <a href="https://github.com/Maidehnless">GitHub</a>
+          <a href="https://backloggd.com/u/Maidehnless/">Backloggd</a>
+        </div>
+      </noscript>
+    </section>
+  </main>
+  <script>
+    (() => {
+      'use strict';
+
+      const history = document.getElementById('history');
+      const terminal = document.querySelector('.terminal');
+      const form = document.getElementById('command-form');
+      const input = document.getElementById('command');
+      const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const repositoryUrl = 'https://github.com/Maidehnless/maidehnless.github.io/tree/main';
+      const destination = [
+        { code: 'stm',  label: 'Steam',                url: 'https://steamcommunity.com/id/maidehnless',                       aliases: ['steam'] },
+        { code: 'bptf', label: 'Backpack.tf listings', url: 'https://next.backpack.tf/profiles/76561198320688865/listings', aliases: ['backpack', 'backpack.tf'] },
+        { code: 'trd',  label: 'Trade URL',            url: 'https://steamcommunity.com/tradeoffer/new/?partner=360423137&token=fnw5189U', aliases: ['trade'] },
+        { code: 'dsc',  label: 'Discord',              url: 'https://discord.com/users/268722078633558019',                 aliases: ['discord'] },
+        { code: 'ttv',  label: 'Twitch',               url: 'https://www.twitch.tv/maidehnless',                              aliases: ['twitch'] },
+        { code: 'gb',   label: 'GameBanana',           url: 'https://gamebanana.com/members/4432632',                        aliases: ['gamebanana'] },
+        { code: 'gh',   label: 'GitHub',               url: 'https://github.com/Maidehnless',                                 aliases: ['github'] },
+        { code: 'bl',   label: 'Backloggd',            url: 'https://backloggd.com/u/Maidehnless/',                           aliases: ['backloggd'] }
+      ];
+      const bannerLines = [
+        '███╗   ███╗ █████╗ ██╗██████╗ ███████╗██╗  ██╗███╗   ██╗██╗     ███████╗███████╗███████╗',
+        '████╗ ████║██╔══██╗██║██╔══██╗██╔════╝██║  ██║████╗  ██║██║     ██╔════╝██╔════╝██╔════╝',
+        '██╔████╔██║███████║██║██║  ██║█████╗  ███████║██╔██╗ ██║██║     █████╗  ███████╗███████╗',
+        '██║╚██╔╝██║██╔══██║██║██║  ██║██╔══╝  ██╔══██║██║╚██╗██║██║     ██╔══╝  ╚════██║╚════██║',
+        '██║ ╚═╝ ██║██║  ██║██║██████╔╝███████╗██║  ██║██║ ╚████║███████╗███████╗███████║███████║',
+        '╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝╚══════╝'
+      ];
+
+      // Maintain the latest output in view, unless the visitor has scrolled up
+      // to read older commands. Command entry always remains visible below.
+      let followOutput = true;
+      const atBottom = () => history.scrollHeight - history.clientHeight - history.scrollTop < 32;
+      const revealLatest = () => {
+        if (followOutput) history.scrollTop = history.scrollHeight;
+      };
+      history.addEventListener('scroll', () => {
+        followOutput = atBottom();
+      }, { passive: true });
+      terminal.addEventListener('wheel', event => {
+        // Wheel works even when hovering over the fixed prompt or terminal padding.
+        // Preserve horizontal scrolling for the wide ASCII banner with Shift+wheel.
+        if (event.shiftKey && event.target.closest('.banner')) return;
+        event.preventDefault();
+        const scale = event.deltaMode === 1 ? 24 : event.deltaMode === 2 ? history.clientHeight : 1;
+        history.scrollTop += event.deltaY * scale;
+        followOutput = atBottom();
+      }, { passive: false });
+
+      // Reveal characters on successive animation frames, not all at once.
+      // The banner is faster than ordinary console messages but still visibly types out.
+      function typeInto(element, text, msPerCharacter = 11) {
+        if (!text) return Promise.resolve();
+        if (reducedMotion) {
+          element.textContent = text;
+          revealLatest();
+          return Promise.resolve();
+        }
+        element.textContent = '';
+        element.classList.add('typing');
+        return new Promise(resolve => {
+          let started;
+          function frame(now) {
+            if (started === undefined) started = now;
+            const length = Math.min(text.length, 1 + Math.floor((now - started) / msPerCharacter));
+            element.textContent = text.slice(0, length);
+            revealLatest();
+            if (length >= text.length) {
+              element.classList.remove('typing');
+              resolve();
+            } else {
+              requestAnimationFrame(frame);
+            }
+          }
+          requestAnimationFrame(frame);
+        });
+      }
+
+      function row(className = 'line') {
+        const element = document.createElement('div');
+        element.className = className;
+        history.appendChild(element);
+        revealLatest();
+        return element;
+      }
+      async function print(text, speed = 11, className = 'line') {
+        const element = row(className);
+        await typeInto(element, text, speed);
+        return element;
+      }
+      function blank() { row('blank'); }
+      function echo(value) {
+        const line = row('prompt-line');
+        const prefix = document.createElement('span');
+        prefix.className = 'prefix';
+        prefix.textContent = 'guest@maidehnless:~$';
+        const command = document.createElement('span');
+        command.className = 'command-text';
+        command.textContent = value;
+        line.append(prefix, command);
+        return command;
+      }
+      async function boot() {
+        const cmd = echo('');
+        await typeInto(cmd, 'connect', 34);
+        await print('Resolving maidehnless.github.io...', 12, 'line dim');
+        const line = row('line connected');
+        const text = document.createElement('span');
+        const anchor = document.createElement('a');
+        anchor.href = repositoryUrl;
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+        anchor.textContent = 'maidehnless.github.io';
+        line.appendChild(text);
+        await typeInto(text, 'Connected to ', 14);
+        const typedHost = document.createElement('span');
+        line.appendChild(typedHost);
+        await typeInto(typedHost, 'maidehnless.github.io', 12);
+        typedHost.replaceWith(anchor);
+        blank();
+        await print('Type "help" to show available commands.', 10, 'line dim');
+        blank();
+      }
+
+      async function showHelp() {
+        const banner = document.createElement('pre');
+        banner.className = 'banner';
+        banner.setAttribute('aria-label', 'ASCII banner reading MAIDEHNLESS');
+        history.appendChild(banner);
+        revealLatest();
+        for (let index = 0; index < bannerLines.length; index++) {
+          const span = document.createElement('span');
+          span.className = 'banner-line';
+          banner.appendChild(span);
+          await typeInto(span, bannerLines[index], 2.2);
+          if (index < bannerLines.length - 1) banner.appendChild(document.createTextNode('\n'));
+        }
+        await print('Available commands:', 10, 'line dim');
+        const nav = document.createElement('nav');
+        nav.className = 'directory';
+        nav.setAttribute('aria-label', 'Profile links');
+        history.appendChild(nav);
+        for (const entry of destination) {
+          const link = document.createElement('a');
+          link.href = entry.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.title = `Open ${entry.label}`;
+          const abbreviation = document.createElement('span');
+          abbreviation.className = 'abbr';
+          const name = document.createElement('span');
+          name.className = 'name';
+          link.append(abbreviation, name);
+          nav.appendChild(link);
+          revealLatest();
+          await typeInto(abbreviation, entry.code, 10);
+          await typeInto(name, entry.label, 6);
+        }
+        const clearEntry = document.createElement('div');
+        clearEntry.className = 'local-command';
+        const clearCode = document.createElement('span');
+        clearCode.className = 'abbr';
+        const clearDescription = document.createElement('span');
+        clearDescription.className = 'name';
+        clearEntry.append(clearCode, clearDescription);
+        nav.appendChild(clearEntry);
+        await typeInto(clearCode, 'clear', 9);
+        await typeInto(clearDescription, 'Clear terminal', 9);
+        blank();
+      }
+
+      // Keep output from overlapping when commands are entered rapidly.
+      let queue = boot();
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const original = input.value.trim();
+        const command = original.toLowerCase();
+        input.value = '';
+        input.focus({ preventScroll: true });
+        if (!original) return;
+
+        // Open new tabs synchronously in the user gesture to avoid popup blocking.
+        const entry = destination.find(item => command === item.code || item.aliases.includes(command));
+        if (entry) window.open(entry.url, '_blank', 'noopener,noreferrer');
+
+        queue = queue.then(async () => {
+          // Submitting a command jumps back to live output; scrolling only affects
+          // the history pane, never the overall terminal dimensions.
+          followOutput = true;
+          echo(original);
+          if (command === 'help' || command === '?') {
+            await showHelp();
+          } else if (command === 'clear' || command === 'cls') {
+            history.replaceChildren();
+            history.scrollTop = 0;
+            followOutput = true;
+          } else if (entry) {
+            await print(`Opening ${entry.label}...`, 12, 'line dim');
+            blank();
+          } else {
+            await print(`[${original}] is not recognized as an internal or external command. Use "help"`, 7);
+            blank();
+          }
+        }).catch(error => console.error('Terminal output error:', error));
+      });
+
+      // Clicking a blank area, the banner or a link does not steal input focus.
+      // Tab navigation is left available for keyboard/screen-reader accessibility.
+      document.addEventListener('mousedown', event => {
+        if (event.button === 0 && event.target !== input) {
+          event.preventDefault();
+          input.focus({ preventScroll: true });
+        }
+      });
+      document.addEventListener('click', () => {
+        if (document.activeElement !== input) input.focus({ preventScroll: true });
+      });
+      window.addEventListener('focus', () => input.focus({ preventScroll: true }));
+      document.addEventListener('keydown', event => {
+        if (document.activeElement === input || event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
+        if (event.key.length === 1) {
+          event.preventDefault();
+          input.focus({ preventScroll: true });
+          input.setRangeText(event.key, input.selectionStart, input.selectionEnd, 'end');
+        } else if (event.key === 'Backspace') {
+          event.preventDefault();
+          input.focus({ preventScroll: true });
+          const start = input.selectionStart;
+          const end = input.selectionEnd;
+          if (start !== end) input.setRangeText('', start, end, 'end');
+          else if (start > 0) input.setRangeText('', start - 1, end, 'end');
+        }
+      });
+      // Avoid unnecessary soft-keyboard popups on mobile until a user taps.
+      if (!matchMedia('(pointer: coarse)').matches) input.focus({ preventScroll: true });
+    })();
+  </script>
 </body>
 </html>

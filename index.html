@@ -1,0 +1,144 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <meta content="#000000" name="theme-color" />
+    <meta
+      content="maiDOS — a personal terminal and social directory."
+      name="description"
+    />
+    <meta content="maiDOS" property="og:title" />
+    <meta
+      content="Access Point: [U:1:360423137]. Blackwall daemon installation override."
+      property="og:description"
+    />
+    <meta content="website" property="og:type" />
+    <title>maiDOS</title>
+    <link href="assets/icons/favicon.svg" rel="icon" />
+
+    <link href="styles/desktop.css" rel="stylesheet" />
+    <link href="styles/windows.css" rel="stylesheet" />
+  </head>
+  <body>
+    <main>
+      <section aria-label="Login" class="login-screen" id="login-screen">
+        <div class="login-profile">
+          <img
+            alt="Samurai emblem"
+            class="avatar"
+            height="180"
+            src="assets/images/samurai.png"
+            width="180"
+          />
+          <h1 class="username">Samurai</h1>
+          <button class="login-button" id="login-button" type="button">
+            Login
+          </button>
+        </div>
+      </section>
+      <section
+        aria-label="maiDOS desktop"
+        class="session"
+        hidden=""
+        id="session"
+      >
+        <div class="desktop-workspace" id="desktop-workspace">
+          <div aria-hidden="true" class="desktop-decoration">
+            <div class="deco-top">
+              <div class="deco-neon">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i
+                ><span class="deco-heading">MAIDEHNLESS</span>
+              </div>
+              <div class="deco-dots">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i
+                ><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+              <div class="deco-strip">
+                <span>maiDOS // DESKTOP INTERFACE</span
+                ><span>LOCAL / 01 — SAMURAI</span>
+              </div>
+            </div>
+            <div class="deco-frame">
+              <div class="deco-inner"></div>
+              <i class="deco-rail left-a"></i><i class="deco-rail left-b"></i
+              ><i class="deco-rail left-c"></i><i class="deco-rail right-a"></i
+              ><i class="deco-rail right-b"></i><i class="deco-rail right-c"></i
+              ><i class="deco-side a"></i><i class="deco-side b"></i
+              ><i class="deco-side c"></i>
+            </div>
+            <div class="deco-footer">
+              <div>
+                <p>CUSTOM GLITCHES ON UI MAY APPEAR, BASED ON THIS ANALYSIS.</p>
+                <p>DOCUMENT / MAIDOS-01 / DESKTOP INTERFACE</p>
+                <p>TYPE: CYBERSPACE</p>
+              </div>
+              <div class="deco-code">
+                <span>PROTOCOL<br />6520-A44</span
+                ><span>02:23 1.93743 0.4435<br />02:35 4.93743 0.0000</span
+                ><i class="deco-bars"></i>
+              </div>
+            </div>
+          </div>
+          <nav
+            aria-label="Desktop apps"
+            class="desktop-icons"
+            id="desktop-icons"
+          ></nav>
+          <div
+            aria-label="App windows"
+            class="window-layer"
+            id="window-layer"
+          ></div>
+        </div>
+        <footer aria-label="Desktop taskbar" class="taskbar">
+          <div class="taskbar-left">
+            <span class="desktop-brand">maiDOS</span>
+            <div class="task-apps" id="task-apps"></div>
+          </div>
+          <div class="task-clock">
+            <time aria-label="Local time" id="clock-time"></time
+            ><time aria-label="Local date" id="clock-date"></time>
+          </div>
+        </footer>
+      </section>
+    </main>
+    <div aria-live="polite" class="sr-only" id="announcer" role="status"></div>
+    <noscript
+      ><style>
+        .login-screen {
+          display: none;
+        }
+        .fallback {
+          margin: 30px auto;
+          padding: 20px;
+          max-width: 700px;
+          height: calc(100dvh - 60px);
+          overflow: auto;
+        }
+        .fallback a {
+          display: block;
+          color: #d7f36f;
+          padding: 8px;
+        }
+      </style>
+      <nav aria-label="Social links" class="fallback">
+        <h1>maiDOS</h1>
+        <a href="https://steamcommunity.com/id/maidehnless">Steam</a
+        ><a href="https://next.backpack.tf/profiles/76561198320688865/listings"
+          >Backpack.tf listings</a
+        ><a
+          href="https://steamcommunity.com/tradeoffer/new/?partner=360423137&amp;token=fnw5189U"
+          >Trade URL</a
+        ><a href="https://discord.com/users/268722078633558019">Discord</a
+        ><a href="https://www.twitch.tv/maidehnless">Twitch</a
+        ><a href="https://gamebanana.com/members/4432632">GameBanana</a
+        ><a href="https://github.com/Maidehnless">GitHub</a
+        ><a href="https://backloggd.com/u/Maidehnless/">Backloggd</a>
+      </nav></noscript
+    >
+
+    <script src="desktop.js" type="module"></script>
+  </body>
+</html>

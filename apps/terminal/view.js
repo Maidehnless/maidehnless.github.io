@@ -1,0 +1,2 @@
+export const view =
+  '<div aria-label="Terminal output" class="screen" id="screen" tabindex="0"><div aria-busy="false" id="output"></div><form autocomplete="off" class="command-form" hidden="" id="command-form"><label for="command">samurai@maiDOS:~$</label><input aria-label="Terminal command; type help for links" autocapitalize="off" autocomplete="off" autocorrect="off" disabled="" enterkeyhint="go" id="command" maxlength="300" spellcheck="false" type="text"/><button class="send" type="submit">Run</button></form></div>';

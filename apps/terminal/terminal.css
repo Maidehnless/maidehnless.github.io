@@ -1,0 +1,199 @@
+/* Extracted from the supplied latest maiDOS page. */
+:where(.terminal-app) .screen {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 23px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: #43434c transparent;
+  overflow-wrap: anywhere;
+}
+:where(.terminal-app) .line {
+  white-space: pre-wrap;
+  min-height: 1.5em;
+}
+:where(.terminal-app) .dim {
+  color: var(--muted);
+}
+:where(.terminal-app) .accent,
+:where(.terminal-app) .prefix {
+  color: var(--accent);
+}
+:where(.terminal-app) .spacer {
+  height: 1.5em;
+}
+:where(.terminal-app) .prompt-line {
+  display: flex;
+  gap: 1ch;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+:where(.terminal-app) .prefix {
+  white-space: nowrap;
+}
+:where(.terminal-app) .banner-wrap {
+  margin: 22px 0 24px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #43434c transparent;
+}
+:where(.terminal-app) .banner {
+  font: 14px/1.05 var(--font);
+  color: var(--accent);
+  white-space: pre;
+  margin: 0;
+  width: max-content;
+}
+:where(.terminal-app) .directory {
+  display: grid;
+  gap: 0;
+  margin: 10px 0 22px;
+}
+:where(.terminal-app) .directory a,
+:where(.terminal-app) .local-commands button {
+  display: flex;
+  gap: 2ch;
+  width: fit-content;
+  max-width: 100%;
+  text-decoration: none;
+  color: var(--text);
+  padding: 3px 6px;
+  margin-left: -6px;
+  border: 1px solid transparent;
+  line-height: 1.5;
+}
+:where(.terminal-app) .directory a:hover,
+:where(.terminal-app) .directory a:focus-visible,
+:where(.terminal-app) .local-commands button:hover,
+:where(.terminal-app) .local-commands button:focus-visible {
+  color: #fff;
+  background: #242629;
+  border-color: #434934;
+  outline: none;
+}
+:where(.terminal-app) .code {
+  min-width: 5ch;
+  color: var(--accent);
+}
+:where(.terminal-app) .local-commands {
+  display: grid;
+  gap: 0;
+  margin: 34px 0 22px;
+}
+:where(.terminal-app) .local-commands button {
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+:where(.terminal-app) .command-form {
+  display: flex;
+  align-items: baseline;
+  gap: 1ch;
+  margin-top: 4px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+:where(.terminal-app) .command-form label {
+  color: var(--accent);
+  white-space: nowrap;
+  cursor: text;
+}
+:where(.terminal-app) .command-form input {
+  border: 0;
+  outline: none;
+  padding: 0;
+  flex: 1 1 80px;
+  min-width: 30px;
+  width: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  caret-color: var(--accent);
+  font: inherit;
+}
+:where(.terminal-app) .command-form input:disabled {
+  opacity: 0.5;
+}
+:where(.terminal-app) .send {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+}
+:where(.terminal-app) .send:focus-visible {
+  position: static;
+  width: auto;
+  height: auto;
+  clip: auto;
+  border: 1px solid var(--border);
+  background: var(--chrome);
+  color: var(--accent);
+}
+:where(.terminal-app) .typing:after {
+  content: "▌";
+  color: var(--accent);
+  animation: blink 0.7s steps(1) infinite;
+}
+:where(.terminal-app) .connecting:after {
+  content: "...";
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  width: 0;
+  animation: dots 1s steps(4, end) infinite;
+}
+:where(.terminal-app) .transfer {
+  margin: 4px 0 13px;
+}
+:where(.terminal-app) .transfer-bar {
+  white-space: pre;
+  font: inherit;
+  line-height: 1.5;
+}
+:where(.terminal-app) .transfer-stats {
+  font-size: 12px;
+  min-height: 1.5em;
+}
+:where(.terminal-app) .manual-link {
+  display: inline-block;
+  color: var(--accent);
+  margin: 4px 0 16px;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes dots {
+  to {
+    width: 3ch;
+  }
+}
+@media (max-width: 700px) {
+  :where(.terminal-app) .screen {
+    padding: 19px 16px;
+  }
+  :where(.terminal-app) .command-form input {
+    font-size: 16px;
+  }
+  :where(.terminal-app) .banner {
+    font-size: clamp(6.6px, 1.9vw, 12px);
+  }
+  :where(.terminal-app) .directory a,
+  :where(.terminal-app) .local-commands button {
+    padding-block: 5px;
+  }
+}
+.terminal-app {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.terminal-app .screen {
+  width: 100%;
+  height: 100%;
+}
